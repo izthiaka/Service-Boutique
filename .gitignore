@@ -1,0 +1,25 @@
+# dependencies
+node_modules
+dist
+package-lock.json
+
+# local env files
+.env
+
+# production
+/build
+
+# misc
+.DS_Store
+
+# dev
+.scannerwork
+ecosystem.config.cjs
+
+# debug
+npm-debug.log*
+sonar-project.properties
+ecosystem.config.cjs
+service_account.json
+data
+coverage
