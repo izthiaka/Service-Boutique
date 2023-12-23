@@ -13,6 +13,9 @@ import settingCorsOption from "../core/config/cors"
 import settingApiKey from "../core/config/api_key"
 
 
+import SHOP_OWNERSHIP_V1_ROUTES from "../features/user/routes/shop_ownership.routeHandle"
+
+
 const app = express()
 
 app.use(settingCorsOption)
@@ -49,6 +52,9 @@ app.use((req, res, next) => {
   }
 })
 
-// ROUTES
+
+// USER
+app.use(`${PREFIX_API_V1}/users/shop_ownerships`, SHOP_OWNERSHIP_V1_ROUTES)
+
 
 export default app
