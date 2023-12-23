@@ -2,7 +2,7 @@ import UserGender from "../../../../core/constant/sexe_user"
 import UserStatusAccount from "../../../../core/constant/user_status_account"
 import VerifyField from "../../../../core/utils/verify_field"
 
-export default class ShopOwnerParamsVerify extends VerifyField {
+export default class ShopManagerParamsVerify extends VerifyField {
 
     matricule(req_body: any) {
         if (this.isValid(req_body.matricule)) {
@@ -25,16 +25,6 @@ export default class ShopOwnerParamsVerify extends VerifyField {
         return "L'input [sexe] est requis"
     }
 
-    name(req_body: any) {
-        if (this.isValid(req_body.name)) {
-            if (this.isString(req_body.name)) {
-                return null
-            }
-            return "L'input [name] doit être une chaîne"
-        }
-        return "L'input [name] est requis"
-    }
-
     role(req_body: any) {
         if (this.isValid(req_body.role)) {
             if (this.isString(req_body.role)) {
@@ -43,6 +33,16 @@ export default class ShopOwnerParamsVerify extends VerifyField {
             return "L'input [role] doit être une chaîne"
         }
         return "L'input [role] est requis"
+    }
+
+    name(req_body: any) {
+        if (this.isValid(req_body.name)) {
+            if (this.isString(req_body.name)) {
+                return null
+            }
+            return "L'input [name] doit être une chaîne"
+        }
+        return "L'input [name] est requis"
     }
 
     email(req_body: any) {

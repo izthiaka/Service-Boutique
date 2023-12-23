@@ -1,9 +1,9 @@
 import { ShopUserEntity } from "../schemas/shop_user"
-import { COLLECTION_ROLE_NAME } from "../schemas/role"
 
 import OptionPagination from "../../../core/utils/option_pagination"
 
 import IDatasource from "../../../core/interfaces/interface_datasource"
+import { COLLECTION_ROLE_NAME } from "../schemas/role"
 
 const LookUpRole = {
     $lookup: {
@@ -13,13 +13,14 @@ const LookUpRole = {
         as: "role",
     },
 }
-export interface IDatasourceShopOwner extends IDatasource {
+
+export interface IDatasourceShopManager extends IDatasource {
     isExiste(match: object): Promise<boolean>
     filter(page: string, limit: string, query: string): Promise<any>
 }
 
-export default class ShopOwnerDatasource
-    implements IDatasourceShopOwner {
+export default class ShopManagerDatasource
+    implements IDatasourceShopManager {
     constructor(private schema = ShopUserEntity) { }
 
     async findAll(page: string, limit: string) {
@@ -30,7 +31,7 @@ export default class ShopOwnerDatasource
                 { $unwind: "$role"},
                 { 
                     $match: {
-                        "role.name": "Propriétaire"
+                        "role.name": "Gérant"
                     }
                 },
                 {
@@ -48,8 +49,14 @@ export default class ShopOwnerDatasource
             const result = await this.schema.aggregate([
                 LookUpRole,
                 { $unwind: "$role"},
-                { $match: match },
-
+                { $match: {
+                    $and : [
+                        {
+                            "role.name": "Gérant"
+                        },
+                        match,
+                    ],
+                }}
             ]).exec()
 
             return result[0]
@@ -67,9 +74,9 @@ export default class ShopOwnerDatasource
                     { $match: {
                         $and : [
                             {
-                                "role.name": "Propriétaire"
+                                "role.name": "Gérant"
                             },
-                            { matricule: code },
+                            { name: code },
                         ],
                     }}
                 ])
@@ -90,7 +97,7 @@ export default class ShopOwnerDatasource
                     { $match: {
                         $and : [
                             {
-                                "role.name": "Propriétaire"
+                                "role.name": "Gérant"
                             },
                             { matricule: matricule },
                         ],
@@ -110,11 +117,10 @@ export default class ShopOwnerDatasource
                 .aggregate([
                     LookUpRole,
                     { $unwind: "$role"},
-                    { $match: { matricule: code } },
                     { $match: {
                         $and : [
                             {
-                                "role.name": "Propriétaire"
+                                "role.name": "Gérant"
                             },
                             { matricule: code },
                         ],
@@ -164,7 +170,7 @@ export default class ShopOwnerDatasource
                 { $unwind: "$role"},
                 {   $match:  {
                         $and : [
-                            { "role.name": "Propriétaire" }
+                            { "role.name": "Gérant" }
                         ],
                         $or: [
                             { name: searchString },

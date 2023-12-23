@@ -1,24 +1,24 @@
-import IDatasourceShopOwner from "../datasources/shop_ownership.datasource"
+import IDatasourceShopManager from "../datasources/shop_manager.datasource"
 import IRepository from "../../../core/interfaces/interface_repository"
 
 import VerifyField from "../../../core/utils/verify_field"
-import ShopOwnerSpecificField from "../helpers/specific_field/shop_ownership.specific_field"
+import ShopManagerSpecificField from "../helpers/specific_field/shop_manager.specific_field"
 import MatriculeGenerate from "../../../core/utils/matricule_generate"
 import PrefixUser from "../../../core/constant/prefix_user"
 import RoleDatasource from "../datasources/role.datasource"
 
 
-interface IShopOwnerRepository extends IRepository {
+interface IShopManagerRepository extends IRepository {
     updateStatusAccount(matricule: string, body: object): any
     filterList(page: string, limit: string, query: object): any
 }
 
-export default class ShopOwnerRepository
+export default class ShopManagerRepository
     extends VerifyField
-    implements IShopOwnerRepository {
+    implements IShopManagerRepository {
     private matricule = new MatriculeGenerate()
 
-    constructor(private datasource: IDatasourceShopOwner) {
+    constructor(private datasource: IDatasourceShopManager) {
         super()
     }
 
@@ -28,7 +28,7 @@ export default class ShopOwnerRepository
 
             if (result.data.length !== 0) {
                 const list = result.data.map((value: object) =>
-                    ShopOwnerSpecificField.fields(value),
+                    ShopManagerSpecificField.fields(value),
                 )
                 return {
                     pagination: {
@@ -47,7 +47,7 @@ export default class ShopOwnerRepository
 
     async save(body: any) {
         try {
-            const data = ShopOwnerSpecificField.fromBody(body)
+            const data = ShopManagerSpecificField.fromBody(body)
 
             if (data.email) {
                 const matchEmail = {
@@ -66,10 +66,10 @@ export default class ShopOwnerRepository
             }
 
             const roleDatasource = new RoleDatasource()
-            const role = await roleDatasource.findOneByName("Propriétaire")
-            if (!role) throw Error(`Role d'utilisateur [Propriétaire] introuvable`)
+            const role = await roleDatasource.findOneByName("Gérant")
+            if (!role) throw Error(`Role d'utilisateur [Gérant] introuvable`)
                 
-            const matricule = this.matricule.generate(PrefixUser.proprio)
+            const matricule = this.matricule.generate(PrefixUser.gerant)
             const bodyRequest = {
                 ...data,
                 role : role.code,
@@ -79,7 +79,7 @@ export default class ShopOwnerRepository
             await this.datasource.store(bodyRequest)
 
             const result = await this.datasource.findOneByCode(matricule)
-            return ShopOwnerSpecificField.fields(result)
+            return ShopManagerSpecificField.fields(result)
             
         } catch (error: any) {
             throw Error(error)
@@ -90,7 +90,7 @@ export default class ShopOwnerRepository
         try {
             const result = await this.datasource.findOneByCode(code)
             if (this.isValid(result)) {
-                return ShopOwnerSpecificField.fieldsDetail(result)
+                return ShopManagerSpecificField.fieldsDetail(result)
             }
             throw Error("Utilisateur introuvable")
         } catch (error: any) {
@@ -102,7 +102,7 @@ export default class ShopOwnerRepository
         try {
             const result = await this.datasource.findOneByCode(code)
             if (this.isValid(result)) {
-                const data = ShopOwnerSpecificField.fromBody(body)
+                const data = ShopManagerSpecificField.fromBody(body)
     
                 if (data.email) {
                     const matchEmail = {
@@ -127,7 +127,7 @@ export default class ShopOwnerRepository
                 const collection = await this.datasource.update(code, data)
                 if (this.isValid(collection)) {
                     const data = await this.datasource.findOneByCode(code)
-                    return ShopOwnerSpecificField.fields(data)
+                    return ShopManagerSpecificField.fields(data)
                 }
             }
             throw Error("Utilisateur introuvable")
@@ -144,7 +144,7 @@ export default class ShopOwnerRepository
                 const collection = await this.datasource.update(code, body)
                 if (this.isValid(collection)) {
                     const data = await this.datasource.findOneByCode(code)
-                    return ShopOwnerSpecificField.fields(data)
+                    return ShopManagerSpecificField.fields(data)
                 }
             }
             throw Error("Utilisateur introuvable")
@@ -155,13 +155,13 @@ export default class ShopOwnerRepository
 
     async filterList(page: string, limit: string, query: object) {
         try {
-            const objet = ShopOwnerSpecificField.search(query)
+            const objet = ShopManagerSpecificField.search(query)
             if (this.isValid(objet.data)) {
                 const collection = await this.datasource.filter(page, limit, objet.data)
 
                 if (collection.data.length !== 0) {
                     const list = collection.data.map((value: object) =>
-                        ShopOwnerSpecificField.fields(value),
+                        ShopManagerSpecificField.fields(value),
                     )
                     return {
                         pagination: {
@@ -171,7 +171,7 @@ export default class ShopOwnerRepository
                         list,
                     }
                 }
-                return true
+                return []
             }
             return []
         } catch (error: any) {

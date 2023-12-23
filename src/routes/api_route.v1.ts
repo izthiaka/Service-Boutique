@@ -14,6 +14,7 @@ import settingApiKey from "../core/config/api_key"
 
 
 import SHOP_OWNERSHIP_V1_ROUTES from "../features/user/routes/shop_ownership.routeHandle"
+import SHOP_MANAGER_V1_ROUTES from "../features/user/routes/shop_manager.routeHandle"
 
 
 const app = express()
@@ -55,6 +56,7 @@ app.use((req, res, next) => {
 
 // USER
 app.use(`${PREFIX_API_V1}/users/shop_ownerships`, SHOP_OWNERSHIP_V1_ROUTES)
+app.use(`${PREFIX_API_V1}/users/shop_managers`, SHOP_MANAGER_V1_ROUTES)
 
 
 export default app

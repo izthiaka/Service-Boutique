@@ -2,12 +2,10 @@ import { readFile } from "fs/promises"
 import ISeeder from "../../../core/interfaces/interface_seeder"
 import ApiResponse from "../../../core/utils/ApiResponse"
 import MatriculeGenerate from "../../../core/utils/matricule_generate"
-import ShopOwnerDatasource from "../datasources/shop_ownership.datasource"
-import ShopOwnerSpecificField from "../helpers/specific_field/shop_ownership.specific_field"
-import PrefixUser from "../../../core/constant/prefix_user"
 import RoleDatasource from "../datasources/role.datasource"
+import RoleSpecificField from "../helpers/specific_field/role.specific_field"
 
-interface SeederDataShopOwnership {
+interface SeederDataRole {
     name: string,
     sexe: string,
     email: string,
@@ -15,11 +13,11 @@ interface SeederDataShopOwnership {
 }
 
 const URL_SEEDER_FILE =
-    "src/features/user/seeders/data/shop_ownerships.json"
+    "src/features/user/seeders/data/roles.json"
 
-export default class ShopOwnershipSeeder extends ApiResponse implements ISeeder {
+export default class RoleSeeder extends ApiResponse implements ISeeder {
     constructor(
-        private datasource = new ShopOwnerDatasource(),
+        private datasource = new RoleDatasource(),
         private urlSeeder = URL_SEEDER_FILE,
         private matricule = new MatriculeGenerate(),
     ) {
@@ -30,9 +28,9 @@ export default class ShopOwnershipSeeder extends ApiResponse implements ISeeder 
         try {
             const fileContentBuffer = await readFile(this.urlSeeder)
             const fileContentString = fileContentBuffer.toString("utf-8")
-            const parsedData: SeederDataShopOwnership[] = JSON.parse(
+            const parsedData: SeederDataRole[] = JSON.parse(
                 fileContentString,
-                ) as SeederDataShopOwnership[]
+                ) as SeederDataRole[]
             return parsedData
         } catch (error) {
             return null
@@ -41,10 +39,10 @@ export default class ShopOwnershipSeeder extends ApiResponse implements ISeeder 
 
     async seed(): Promise<object> {
         try {
-            const shop_ownerships = await this.getFileSeeder()
-            if (shop_ownerships) {
+            const roles = await this.getFileSeeder()
+            if (roles) {
                 const { success, alreadyCreated, total } =
-                    await this.insertSeederIsNotExist(shop_ownerships)
+                    await this.insertSeederIsNotExist(roles)
 
                 const response = {
                     size: total,
@@ -55,31 +53,31 @@ export default class ShopOwnershipSeeder extends ApiResponse implements ISeeder 
                 return {
                     statusCode: 200,
                     success: true,
-                    message: "SEEDERS PROPRIETAIRE BOUTIQUE",
+                    message: "SEEDERS ROLE",
                     data: response,
                 }
             }
             return {
                 statusCode: 500,
                 success: false,
-                message: "FICHIER SEEDERS PROPRIETAIRE BOUTIQUE INTROUVABLE",
+                message: "FICHIER SEEDERS ROLE INTROUVABLE",
             }
         } catch (error) {
             return {
                 statusCode: 500,
                 success: false,
-                message: "ERREURS SEEDERS PROPRIETAIRE BOUTIQUE",
+                message: "ERREURS SEEDERS ROLE",
             }
         }
     }
 
-    async insertSeederIsNotExist(shop_ownerships: SeederDataShopOwnership[]) {
-        const seederToInsert = shop_ownerships.length
+    async insertSeederIsNotExist(roles: SeederDataRole[]) {
+        const seederToInsert = roles.length
         let Inserted = 0
         let alreadyCreated = 0
 
-        for (const shop_ownership of shop_ownerships) {
-            const insertInto = await this.saveData(shop_ownership)
+        for (const role of roles) {
+            const insertInto = await this.saveData(role)
             if (insertInto) {
                 Inserted += 1
             } else {
@@ -94,36 +92,24 @@ export default class ShopOwnershipSeeder extends ApiResponse implements ISeeder 
         }
     }
 
-    async saveData(shop_ownership: SeederDataShopOwnership) {
+    async saveData(role: SeederDataRole) {
         try {
-            const body = ShopOwnerSpecificField.fromSeeder(shop_ownership)
+            const body = RoleSpecificField.fromSeeder(role)
 
-            let isExisteEmail
-            if (body.email) {
-                const matchEmail = {
-                    email: body.email,
+            let isExisteRole
+            if (body.name) {
+                const matchRole = {
+                    name: body.name,
                 }
-                isExisteEmail = await this.datasource.isExiste(matchEmail)
+                isExisteRole = await this.datasource.isExiste(matchRole)
             }
-
-            let isExistePhone
-            if (body.phone) {
-                const matchPhone = {
-                    phone: body.phone,
-                }
-                isExistePhone = await this.datasource.isExiste(matchPhone)
-            }
-
-            const roleDatasource = new RoleDatasource()
-            const role = await roleDatasource.findOneByName("Propriétaire")
             
-            if (!isExisteEmail && !isExistePhone && role) {
-                const matricule = this.matricule.generate(PrefixUser.proprio)
+            if (!isExisteRole) {
+                const code = this.matricule.generate()
 
                 const bodyRequest = {
                     ...body,
-                    role: role.code,
-                    matricule,
+                    code,
                 }
 
                 await this.datasource.store(bodyRequest)

@@ -1,14 +1,13 @@
 import RoleSpecificField from "./role.specific_field"
 
-export default class ShopOwnerSpecificField {
+export default class ShopManagerSpecificField {
     
     static fromBody(objet: any) {
         return {
             name: objet.name,
             gender: objet.sexe,
             email: objet.email,
-            phone: objet.telephone,
-            role: objet.role
+            phone: objet.telephone
         }
     }
     

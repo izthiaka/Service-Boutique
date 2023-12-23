@@ -1,9 +1,10 @@
 import mongoose, { Schema, model } from "mongoose"
 import ShopOwnerStatusAccount from "../../../core/constant/user_status_account"
+import { COLLECTION_ROLE_NAME } from "./role"
 
-export const COLLECTION_SHOP_OWNERSHIP_NAME = "shop_owners"
+export const COLLECTION_SHOP_USER_NAME = "shop_users"
 
-export interface IShopOwner {
+export interface IShopUser {
     _id: mongoose.Types.ObjectId
     matricule: string
     name: string
@@ -12,11 +13,12 @@ export interface IShopOwner {
     phone: string
     status: string
     photo: string
+    role: string
 }
 
-export type ShopOwnerSchema = object & IShopOwner & Document
+export type ShopUserSchema = object & IShopUser & Document
 
-const schema: Schema<ShopOwnerSchema> = new Schema<ShopOwnerSchema>(
+const schema: Schema<ShopUserSchema> = new Schema<ShopUserSchema>(
     {
         matricule: {
           type: String,
@@ -50,8 +52,13 @@ const schema: Schema<ShopOwnerSchema> = new Schema<ShopOwnerSchema>(
             type: String,
             default: null,
         },
+        role: {
+            type: String,
+            ref: COLLECTION_ROLE_NAME,
+            required: true,
+        },
     },
     { timestamps: true },
 )
 
-export const ShopOwnerEntity = model(COLLECTION_SHOP_OWNERSHIP_NAME, schema)
+export const ShopUserEntity = model(COLLECTION_SHOP_USER_NAME, schema)
