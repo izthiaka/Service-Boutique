@@ -58,7 +58,7 @@ export default class ShopOwnerDatasource
         }
     }
 
-    async findOneByName(code: string) {
+    async findOneByName(name: string) {
         try {
             const result = await this.schema
                 .aggregate([
@@ -69,30 +69,7 @@ export default class ShopOwnerDatasource
                             {
                                 "role.name": "Propriétaire"
                             },
-                            { matricule: code },
-                        ],
-                    }}
-                ])
-                .exec()
-
-            return result[0]
-        } catch (error: any) {
-            throw Error(error.message)
-        }
-    }
-
-    async findOneByScoutMatricule(matricule: string) {
-        try {
-            const result = await this.schema
-                .aggregate([
-                    LookUpRole,
-                    { $unwind: "$role"},
-                    { $match: {
-                        $and : [
-                            {
-                                "role.name": "Propriétaire"
-                            },
-                            { matricule: matricule },
+                            { name: name },
                         ],
                     }}
                 ])

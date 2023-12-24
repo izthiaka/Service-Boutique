@@ -1,39 +1,56 @@
-import { ShopUserEntity } from "../schemas/shop_user"
+import { ShopEntity } from "../schemas/shop"
 
 import OptionPagination from "../../../core/utils/option_pagination"
 
 import IDatasource from "../../../core/interfaces/interface_datasource"
-import { COLLECTION_ROLE_NAME } from "../schemas/role"
+import { COLLECTION_SHOP_CATEGORY_NAME } from "../schemas/category"
+import { COLLECTION_SHOP_USER_NAME } from "../../user/schemas/shop_user"
+import { COLLECTION_ROLE_NAME } from "../../user/schemas/role"
 
+const LookUpCategory = {
+    $lookup: {
+        from: COLLECTION_SHOP_CATEGORY_NAME,
+        localField: "category",
+        foreignField: "code",
+        as: "category",
+    },
+}
+const LookUpOwner = {
+    $lookup: {
+        from: COLLECTION_SHOP_USER_NAME,
+        localField: "owner",
+        foreignField: "matricule",
+        as: "owner",
+    },
+}
 const LookUpRole = {
     $lookup: {
         from: COLLECTION_ROLE_NAME,
-        localField: "role",
+        localField: "owner.role",
         foreignField: "code",
-        as: "role",
+        as: "owner.role",
     },
 }
 
-export interface IDatasourceShopManager extends IDatasource {
+export interface IDatasourceShop extends IDatasource {
     isExiste(match: object): Promise<boolean>
     filter(page: string, limit: string, query: string): Promise<any>
 }
 
-export default class ShopManagerDatasource
-    implements IDatasourceShopManager {
-    constructor(private schema = ShopUserEntity) { }
+export default class ShopDatasource
+    implements IDatasourceShop {
+    constructor(private schema = ShopEntity) { }
 
     async findAll(page: string, limit: string) {
         try {
             const FACET = OptionPagination.facetForMongoose(page, limit)
             const result = await this.schema.aggregate([
+                LookUpCategory,
+                { $unwind: "$category" },
+                LookUpOwner,
+                { $unwind: "$owner" },
                 LookUpRole,
-                { $unwind: "$role"},
-                { 
-                    $match: {
-                        "role.name": "Gérant"
-                    }
-                },
+                { $unwind: "$owner.role" },
                 {
                     $sort: { name: 1 },
                 },
@@ -47,16 +64,14 @@ export default class ShopManagerDatasource
     async findOne(match: object) {
         try {
             const result = await this.schema.aggregate([
+                LookUpCategory,
+                { $unwind: "$category" },
+                LookUpOwner,
+                { $unwind: "$owner" },
                 LookUpRole,
-                { $unwind: "$role"},
-                { $match: {
-                    $and : [
-                        {
-                            "role.name": "Gérant"
-                        },
-                        match,
-                    ],
-                }}
+                { $unwind: "$owner.role" },
+                { $match: match },
+
             ]).exec()
 
             return result[0]
@@ -65,20 +80,17 @@ export default class ShopManagerDatasource
         }
     }
 
-    async findOneByName(code: string) {
+    async findOneByName(name: string) {
         try {
             const result = await this.schema
                 .aggregate([
-                    LookUpRole,
-                    { $unwind: "$role"},
-                    { $match: {
-                        $and : [
-                            {
-                                "role.name": "Gérant"
-                            },
-                            { name: code },
-                        ],
-                    }}
+                LookUpCategory,
+                { $unwind: "$category" },
+                LookUpOwner,
+                { $unwind: "$owner" },
+                LookUpRole,
+                { $unwind: "$owner.role" },
+                    { $match: { name: name } },
                 ])
                 .exec()
 
@@ -92,16 +104,13 @@ export default class ShopManagerDatasource
         try {
             const result = await this.schema
                 .aggregate([
+                    LookUpCategory,
+                    { $unwind: "$category" },
+                    LookUpOwner,
+                    { $unwind: "$owner" },
                     LookUpRole,
-                    { $unwind: "$role"},
-                    { $match: {
-                        $and : [
-                            {
-                                "role.name": "Gérant"
-                            },
-                            { matricule: code },
-                        ],
-                    }}
+                    { $unwind: "$owner.role" },
+                    { $match: { code: code } },
                 ])
                 .exec()
 
@@ -120,7 +129,7 @@ export default class ShopManagerDatasource
     }
 
     async update(code: string, body: object) {
-        const filter = { matricule: code }
+        const filter = { code: code }
         const option = { new: true }
         try {
             return await this.schema.findOneAndUpdate(filter, body, option).exec()
@@ -139,22 +148,32 @@ export default class ShopManagerDatasource
         return result
     }
 
+    async deleteOne(code: string) {
+        try {
+            return await this.schema.deleteOne({ code: code }).exec()
+        } catch (error: any) {
+            throw Error(error.message)
+        }
+    }
+
     async filter(page: string, limit: string, searchString: string) {
         try {
             const FACET = OptionPagination.facetForMongoose(page, limit)
             const result = await this.schema.aggregate([
+                LookUpCategory,
+                { $unwind: "$category" },
+                LookUpOwner,
+                { $unwind: "$owner" },
                 LookUpRole,
-                { $unwind: "$role"},
+                { $unwind: "$owner.role" },
                 {   $match:  {
-                        $and : [
-                            { "role.name": "Gérant" }
-                        ],
                         $or: [
                             { name: searchString },
                             { email: searchString },
                             { phone: searchString },
                             { matricule: searchString },
-                            { "role.name": searchString }
+                            { "category.name": searchString },
+                            { "owner.name": searchString }
                         ]
                     }
                 },
@@ -164,14 +183,6 @@ export default class ShopManagerDatasource
                 FACET
             ]).exec()
             return result[0]
-        } catch (error: any) {
-            throw Error(error.message)
-        }
-    }
-
-    async deleteOne(code: string) {
-        try {
-            return await this.schema.deleteOne({ matricule: code }).exec()
         } catch (error: any) {
             throw Error(error.message)
         }

@@ -53,20 +53,6 @@ export default class ShopCategoryDatasource
         }
     }
 
-    async findOneByScoutMatricule(code: string) {
-        try {
-            const result = await this.schema
-                .aggregate([
-                    { $match: { code: code } },
-                ])
-                .exec()
-
-            return result[0]
-        } catch (error: any) {
-            throw Error(error.message)
-        }
-    }
-
     async findOneByCode(code: string) {
         try {
             const result = await this.schema
