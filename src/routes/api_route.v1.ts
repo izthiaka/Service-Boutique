@@ -20,6 +20,8 @@ import ROLE_V1_ROUTES from "../features/user/routes/role.routeHandle"
 import SHOP_CATEGORY_V1_ROUTES from "../features/shop/routes/category.routeHandle"
 import SHOP_V1_ROUTES from "../features/shop/routes/shop.routeHandle"
 
+import SUBSCRIPTION_V1_ROUTES from "../features/subscription/routes/subscription.routeHandle"
+
 
 const app = express()
 
@@ -35,7 +37,7 @@ app.use(
     saveUninitialized: true,
   }),
 )
-  
+
 app.use(passport.initialize())
 app.use(passport.session())
 
@@ -70,5 +72,7 @@ app.use(`${PREFIX_API_V1}/users/roles`, ROLE_V1_ROUTES)
 app.use(`${PREFIX_API_V1}/shops/categories`, SHOP_CATEGORY_V1_ROUTES)
 app.use(`${PREFIX_API_V1}/shops`, SHOP_V1_ROUTES)
 
+// ABONNEMENT
+app.use(`${PREFIX_API_V1}/abonnements`, SUBSCRIPTION_V1_ROUTES)
 
 export default app
