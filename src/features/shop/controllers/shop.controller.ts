@@ -6,16 +6,23 @@ import OptionPagination from "../../../core/utils/option_pagination"
 
 import ShopParamsVerify from "../helpers/params_verify/shop.params_verify"
 import ShopRepository from "../repositories/shop.repository"
+import UrlFileUtil from "../../../core/utils/url_file"
+import VerifyField from "../../../core/utils/verify_field"
 
 interface IShopController extends IController {
     status(req: Request, res: Response): any
     filter(req: Request, res: Response): any
+    updatePicture(req: Request, res: Response): any
+    resetPicture(req: Request, res: Response): any
 }
+
+const staticUrlImage = "images/shops"
 
 export default class ShopController
     extends ApiResponse
     implements IShopController {
     private verifyParams = new ShopParamsVerify()
+    private verifyField = new VerifyField()
     constructor(private repository: ShopRepository) {
         super("")
     }
@@ -118,6 +125,44 @@ export default class ShopController
             )
             return this.success(res, 200, "La liste des boutique | filtre", result)
             return true
+        } catch (error: any) {
+            return this.sendError(error.message, res)
+        }
+    }
+
+    async updatePicture(req: Request, res: Response) {
+        try {
+            const { params } = req
+
+            const MESSAGE_ERROR = this.verifyParams.code(params)
+            if (MESSAGE_ERROR === null) {
+                const urlImage = UrlFileUtil.getUrlFileIsExist(req, staticUrlImage)
+                if(this.verifyField.isValid(urlImage)) {
+                    const urlHost = UrlFileUtil.setUrlWithHosting(req, urlImage)
+    
+                    const body = { "photo": urlHost }
+    
+                    const result = await this.repository.updatePictureByCode(req, params.code, body)
+                    return this.success(res, 200, "Mise à jour Photo Boutique avec succés", result)
+                }
+                return this.clientError(res, "Pas d'image")
+            }
+            return this.clientError(res, MESSAGE_ERROR)
+        } catch (error: any) {
+            return this.sendError(error.message, res)
+        }
+    }
+
+    async resetPicture(req: Request, res: Response) {
+        try {
+            const { params } = req
+
+            const MESSAGE_ERROR = this.verifyParams.code(params)
+            if (MESSAGE_ERROR === null) {
+                const result = await this.repository.resetPictureByCode(req, params.code)
+                return this.success(res, 200, "Mise à jour Photo Boutique avec succés", result)
+            }
+            return this.clientError(res, MESSAGE_ERROR)
         } catch (error: any) {
             return this.sendError(error.message, res)
         }

@@ -6,10 +6,14 @@ import ShopSpecificField from "../helpers/specific_field/shop.specific_field"
 import MatriculeGenerate from "../../../core/utils/matricule_generate"
 import ShopCategoryDatasource from "../datasources/category.datasource"
 import ShopOwnerDatasource from "../../user/datasources/shop_ownership.datasource"
+import UrlFileUtil from "../../../core/utils/url_file"
+import { Request } from "express"
 
 interface IShopRepository extends IRepository {
     updateStatus(matricule: string, body: object): any
     filterList(page: string, limit: string, query: object): any
+    updatePictureByCode(req: Request, matricule: string, body: object): any
+    resetPictureByCode(req: Request, matricule: string,): any
 }
 
 export default class ShopRepository
@@ -173,6 +177,51 @@ export default class ShopRepository
             if (this.isValid(result)) {
                 const collection = await this.datasource.update(code, body)
                 if (this.isValid(collection)) {
+                    const data = await this.datasource.findOneByCode(code)
+                    return ShopSpecificField.fields(data)
+                }
+            }
+            throw Error("Boutique introuvable")
+        } catch (error: any) {
+            throw Error(error)
+        }
+    }
+
+    async updatePictureByCode(req: Request, code: string, body: object) {
+        try {
+            const result = await this.datasource.findOneByCode(code)
+            if (this.isValid(result)) {
+                const collection = await this.datasource.update(code, body)
+                if (this.isValid(collection)) {
+                    if (result.photo) {
+                        UrlFileUtil.deleteFileAsset(
+                            req,
+                            result.photo
+                        )
+                    }
+                    const data = await this.datasource.findOneByCode(code)
+                    return ShopSpecificField.fields(data)
+                }
+            }
+            throw Error("Boutique introuvable")
+        } catch (error: any) {
+            throw Error(error)
+        }
+    }
+
+    async resetPictureByCode(req: Request, code: string) {
+        try {
+            const result = await this.datasource.findOneByCode(code)
+            if (this.isValid(result)) {
+                const body = { photo: null }
+                const collection = await this.datasource.update(code, body)
+                if (this.isValid(collection)) {
+                if (result.photo) {
+                    UrlFileUtil.deleteFileAsset(
+                        req,
+                        result.photo
+                    )
+                }
                     const data = await this.datasource.findOneByCode(code)
                     return ShopSpecificField.fields(data)
                 }
