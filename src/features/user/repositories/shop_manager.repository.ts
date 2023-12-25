@@ -1,3 +1,5 @@
+import { Request } from "express"
+
 import IDatasourceShopManager from "../datasources/shop_manager.datasource"
 import IRepository from "../../../core/interfaces/interface_repository"
 
@@ -6,11 +8,14 @@ import ShopManagerSpecificField from "../helpers/specific_field/shop_manager.spe
 import MatriculeGenerate from "../../../core/utils/matricule_generate"
 import PrefixUser from "../../../core/constant/prefix_user"
 import RoleDatasource from "../datasources/role.datasource"
+import UrlFileUtil from "../../../core/utils/url_file"
 
 
 interface IShopManagerRepository extends IRepository {
     updateStatusAccount(matricule: string, body: object): any
     filterList(page: string, limit: string, query: object): any
+    updatePictureByCode(matricule: string, body: object): any
+    resetPictureByCode(req: Request, matricule: string): any
 }
 
 export default class ShopManagerRepository
@@ -174,6 +179,45 @@ export default class ShopManagerRepository
                 return []
             }
             return []
+        } catch (error: any) {
+            throw Error(error)
+        }
+    }
+
+    async updatePictureByCode(code: string, body: object) {
+        try {
+            const result = await this.datasource.findOneByCode(code)
+            if (this.isValid(result)) {
+                const collection = await this.datasource.update(code, body)
+                if (this.isValid(collection)) {
+                    const data = await this.datasource.findOneByCode(code)
+                    return ShopManagerSpecificField.fields(data)
+                }
+            }
+            throw Error("Utilisateur introuvable")
+        } catch (error: any) {
+            throw Error(error)
+        }
+    }
+
+    async resetPictureByCode(req: Request, code: string) {
+        try {
+            const result = await this.datasource.findOneByCode(code)
+            if (this.isValid(result)) {
+                const body = { photo: null }
+                const collection = await this.datasource.update(code, body)
+                if (this.isValid(collection)) {
+                if (result.photo) {
+                    UrlFileUtil.deleteFileAsset(
+                        req,
+                        result.photo
+                    )
+                }
+                    const data = await this.datasource.findOneByCode(code)
+                    return ShopManagerSpecificField.fields(data)
+                }
+            }
+            throw Error("Utilisateur introuvable")
         } catch (error: any) {
             throw Error(error)
         }

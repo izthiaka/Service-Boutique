@@ -14,6 +14,16 @@ export default class ShopOwnerParamsVerify extends VerifyField {
         return "L'input [matricule] est requis"
     }
 
+    code(req_body: any) {
+        if (this.isValid(req_body.code)) {
+            if (this.isString(req_body.code)) {
+                return null
+            }
+            return "L'input [code] doit être une chaîne"
+        }
+        return "Le pamarétre [code] est requis"
+    }
+
     sexe(req_body: any) {
         if (this.isValid(req_body.sexe)) {
             const value = UserGender.validation.indexOf(req_body.sexe)

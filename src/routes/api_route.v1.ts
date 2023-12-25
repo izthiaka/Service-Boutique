@@ -39,15 +39,16 @@ app.use(
 app.use(passport.initialize())
 app.use(passport.session())
 
-export const PREFIX_API_V1 = "/api/v1"
 
 // Route for images directory
 app.use(express.static("public"))
+app.use("/images/admin_profil", express.static("/images/admin_profil"))
+
+export const PREFIX_API_V1 = "/api/v1"
 
 const specswagger = swaggerJSDoc(swaggerOptions)
 app.use(`${PREFIX_API_V1}/docs`, swaggerUi.serve, swaggerUi.setup(specswagger))
 
-app.use(settingApiKey)
 app.use((req, res, next) => {
   const url = req.url
   if (url === '/' || !url.startsWith(PREFIX_API_V1)) {
@@ -57,6 +58,7 @@ app.use((req, res, next) => {
   }
 })
 
+app.use(settingApiKey)
 
 // USER
 app.use(`${PREFIX_API_V1}/users/shop_ownerships`, SHOP_OWNERSHIP_V1_ROUTES)
