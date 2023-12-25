@@ -32,9 +32,9 @@ export default class ShopOwnerRepository
             const result = await this.datasource.findAll(page, limit)
 
             if (result.data.length !== 0) {
-                const list = result.data.map((value: object) =>
-                    ShopOwnerSpecificField.fields(value),
-                )
+                const list = result.data.map((value: object) =>{
+                    return ShopOwnerSpecificField.fields(value)
+                })
                 return {
                     pagination: {
                         total: result.metadata[0].total,

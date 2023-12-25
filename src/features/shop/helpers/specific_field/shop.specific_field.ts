@@ -42,6 +42,20 @@ export default class ShopSpecificField {
         }
     }
 
+    static fieldsOnly(objet: any) {
+        return {
+            code: objet.code,
+            name: objet.name,
+            photo: objet.photo,
+            email: objet.email,
+            phone: objet.phone,
+            category: ShopCategorySpecificField.fields(objet.category),
+            adresse: objet.adresse,
+            description: objet.description,
+            status: objet.status
+        }
+    }
+
     static search(objet: any) {
         return {
             data: objet.data

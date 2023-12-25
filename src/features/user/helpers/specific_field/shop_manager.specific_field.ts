@@ -1,3 +1,4 @@
+import ShopSpecificField from "../../../shop/helpers/specific_field/shop.specific_field"
 import RoleSpecificField from "./role.specific_field"
 
 export default class ShopManagerSpecificField {
@@ -41,6 +42,14 @@ export default class ShopManagerSpecificField {
     }
 
     static fieldsDetail(objet: any) {
+        let shops = objet.shops
+        if(shops.lenght !== 0){
+            shops = shops.map((shop: object) => 
+                ShopSpecificField.fieldsOnly(shop)
+            )
+        }else {
+            shops = []
+        }
         return {
             matricule: objet.matricule,
             name: objet.name,
@@ -49,7 +58,8 @@ export default class ShopManagerSpecificField {
             phone: objet.phone,
             status: objet.status,
             photo: objet.photo,
-            role: RoleSpecificField.fields(objet.role)
+            role: RoleSpecificField.fields(objet.role),
+            boutiques: shops
         }
     }
 }

@@ -4,6 +4,7 @@ import { COLLECTION_ROLE_NAME } from "../schemas/role"
 import OptionPagination from "../../../core/utils/option_pagination"
 
 import IDatasource from "../../../core/interfaces/interface_datasource"
+import { COLLECTION_SHOP_NAME } from "../../shop/schemas/shop"
 
 const LookUpRole = {
     $lookup: {
@@ -13,6 +14,16 @@ const LookUpRole = {
         as: "role",
     },
 }
+
+const LookUpShops = {
+    $lookup: {
+        from: COLLECTION_SHOP_NAME,
+        localField: "matricule",
+        foreignField: "owner",
+        as: "shops",
+    },
+}
+
 export interface IDatasourceShopOwner extends IDatasource {
     isExiste(match: object): Promise<boolean>
     filter(page: string, limit: string, query: string): Promise<any>
@@ -87,6 +98,7 @@ export default class ShopOwnerDatasource
                 .aggregate([
                     LookUpRole,
                     { $unwind: "$role"},
+                    LookUpShops,
                     { $match: { matricule: code } },
                     { $match: {
                         $and : [
