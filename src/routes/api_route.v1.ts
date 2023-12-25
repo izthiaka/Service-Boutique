@@ -42,7 +42,8 @@ app.use(passport.session())
 
 // Route for images directory
 app.use(express.static("public"))
-app.use("/images/admin_profil", express.static("/images/admin_profil"))
+app.use("/images/users", express.static("/images/users"))
+app.use("/images/shops/categories", express.static("/images/shops/categories"))
 
 export const PREFIX_API_V1 = "/api/v1"
 

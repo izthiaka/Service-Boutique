@@ -4,6 +4,8 @@ import IRepository from "../../../core/interfaces/interface_repository"
 import VerifyField from "../../../core/utils/verify_field"
 import ShopCategorySpecificField from "../helpers/specific_field/category.specific_field"
 import MatriculeGenerate from "../../../core/utils/matricule_generate"
+import UrlFileUtil from "../../../core/utils/url_file"
+import { Request } from "express"
 
 
 export default class ShopCategoryRepository
@@ -115,5 +117,44 @@ export default class ShopCategoryRepository
 
     async deleteOne(code: string) {
         throw Error(`Fonction deleteOne excepted [${code}]`)
+    }
+
+    async updatePictureByCode(code: string, body: object) {
+        try {
+            const result = await this.datasource.findOneByCode(code)
+            if (this.isValid(result)) {
+                const collection = await this.datasource.update(code, body)
+                if (this.isValid(collection)) {
+                    const data = await this.datasource.findOneByCode(code)
+                    return ShopCategorySpecificField.fields(data)
+                }
+            }
+            throw Error("Catégorie introuvable")
+        } catch (error: any) {
+            throw Error(error)
+        }
+    }
+
+    async resetPictureByCode(req: Request, code: string) {
+        try {
+            const result = await this.datasource.findOneByCode(code)
+            if (this.isValid(result)) {
+                const body = { photo: null }
+                const collection = await this.datasource.update(code, body)
+                if (this.isValid(collection)) {
+                if (result.photo) {
+                    UrlFileUtil.deleteFileAsset(
+                        req,
+                        result.photo
+                    )
+                }
+                    const data = await this.datasource.findOneByCode(code)
+                    return ShopCategorySpecificField.fields(data)
+                }
+            }
+            throw Error("Catégorie introuvable")
+        } catch (error: any) {
+            throw Error(error)
+        }
     }
 }
