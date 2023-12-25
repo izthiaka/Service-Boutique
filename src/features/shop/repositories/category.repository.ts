@@ -1,3 +1,5 @@
+import { Request } from "express"
+
 import IDatasourceShopCategory from "../datasources/category.datasource"
 import IRepository from "../../../core/interfaces/interface_repository"
 
@@ -5,12 +7,16 @@ import VerifyField from "../../../core/utils/verify_field"
 import ShopCategorySpecificField from "../helpers/specific_field/category.specific_field"
 import MatriculeGenerate from "../../../core/utils/matricule_generate"
 import UrlFileUtil from "../../../core/utils/url_file"
-import { Request } from "express"
 
+
+interface IShopCategoryRepository extends IRepository {
+    updatePictureByCode(req: Request, matricule: string, body: object): any
+    resetPictureByCode(req: Request, matricule: string,): any
+}
 
 export default class ShopCategoryRepository
     extends VerifyField
-    implements IRepository {
+    implements IShopCategoryRepository {
     private matricule = new MatriculeGenerate()
 
     constructor(private datasource: IDatasourceShopCategory) {
@@ -119,12 +125,18 @@ export default class ShopCategoryRepository
         throw Error(`Fonction deleteOne excepted [${code}]`)
     }
 
-    async updatePictureByCode(code: string, body: object) {
+    async updatePictureByCode(req: Request, code: string, body: object) {
         try {
             const result = await this.datasource.findOneByCode(code)
             if (this.isValid(result)) {
                 const collection = await this.datasource.update(code, body)
                 if (this.isValid(collection)) {
+                    if (result.photo) {
+                        UrlFileUtil.deleteFileAsset(
+                            req,
+                            result.photo
+                        )
+                    }
                     const data = await this.datasource.findOneByCode(code)
                     return ShopCategorySpecificField.fields(data)
                 }

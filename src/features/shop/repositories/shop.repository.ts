@@ -7,14 +7,14 @@ import MatriculeGenerate from "../../../core/utils/matricule_generate"
 import ShopCategoryDatasource from "../datasources/category.datasource"
 import ShopOwnerDatasource from "../../user/datasources/shop_ownership.datasource"
 
-interface IShoprRepository extends IRepository {
+interface IShopRepository extends IRepository {
     updateStatus(matricule: string, body: object): any
     filterList(page: string, limit: string, query: object): any
 }
 
 export default class ShopRepository
     extends VerifyField
-    implements IShoprRepository {
+    implements IShopRepository {
     private matricule = new MatriculeGenerate()
 
     constructor(private datasource: IDatasourceShop) {

@@ -142,7 +142,7 @@ export default class ShopManagerController
     
                     const body = { "photo": urlHost }
     
-                    const result = await this.repository.updatePictureByCode(params.code, body)
+                    const result = await this.repository.updatePictureByCode(req, params.code, body)
                     return this.success(res, 200, "Mise à jour Photo Profil avec succés", result)
                 }
                 return this.clientError(res, "Pas d'image")

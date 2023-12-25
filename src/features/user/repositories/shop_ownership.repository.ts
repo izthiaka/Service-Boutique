@@ -14,7 +14,7 @@ import UrlFileUtil from "../../../core/utils/url_file"
 interface IShopOwnerRepository extends IRepository {
     updateStatusAccount(matricule: string, body: object): any
     filterList(page: string, limit: string, query: object): any
-    updatePictureByCode(matricule: string, body: object): any
+    updatePictureByCode(req: Request, matricule: string, body: object): any
     resetPictureByCode(req: Request, matricule: string): any
 }
 
@@ -184,12 +184,18 @@ export default class ShopOwnerRepository
         }
     }
 
-    async updatePictureByCode(code: string, body: object) {
+    async updatePictureByCode(req: Request, code: string, body: object) {
         try {
             const result = await this.datasource.findOneByCode(code)
             if (this.isValid(result)) {
                 const collection = await this.datasource.update(code, body)
                 if (this.isValid(collection)) {
+                    if (result.photo) {
+                        UrlFileUtil.deleteFileAsset(
+                            req,
+                            result.photo
+                        )
+                    }
                     const data = await this.datasource.findOneByCode(code)
                     return ShopOwnerSpecificField.fields(data)
                 }

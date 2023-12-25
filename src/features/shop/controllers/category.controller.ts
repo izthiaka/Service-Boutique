@@ -19,7 +19,7 @@ const staticUrlImage = "images/shops/categories"
 
 export default class ShopCategoryController
     extends ApiResponse
-    implements IController {
+    implements IShopManagerController {
     private verifyParams = new ShopCategoryParamsVerify()
     private verifyField = new VerifyField()
     constructor(private repository: ShopCategoryRepository) {
@@ -107,7 +107,7 @@ export default class ShopCategoryController
     
                     const body = { "photo": urlHost }
     
-                    const result = await this.repository.updatePictureByCode(params.code, body)
+                    const result = await this.repository.updatePictureByCode(req, params.code, body)
                     return this.success(res, 200, "Mise à jour Photo Profil avec succés", result)
                 }
                 return this.clientError(res, "Pas d'image")
