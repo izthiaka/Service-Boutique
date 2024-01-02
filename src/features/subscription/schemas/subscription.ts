@@ -1,6 +1,6 @@
 import mongoose, { Schema, model } from "mongoose"
 
-export const COLLECTION_ROLE_NAME = "subscriptions"
+export const COLLECTION_SUBSCRIPTION_NAME = "subscriptions"
 
 export interface ISubscription {
     _id: mongoose.Types.ObjectId
@@ -46,4 +46,4 @@ const schema: Schema<SubscriptionSchema> = new Schema<SubscriptionSchema>(
     { timestamps: true },
 )
 
-export const SubscriptionEntity = model(COLLECTION_ROLE_NAME, schema)
+export const SubscriptionEntity = model(COLLECTION_SUBSCRIPTION_NAME, schema)
