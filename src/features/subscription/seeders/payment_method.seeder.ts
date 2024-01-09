@@ -2,10 +2,10 @@ import { readFile } from "fs/promises"
 import ISeeder from "../../../core/interfaces/interface_seeder"
 import ApiResponse from "../../../core/utils/ApiResponse"
 import MatriculeGenerate from "../../../core/utils/matricule_generate"
-import SubscriptionDatasource from "../datasources/subscription.datasource"
-import SubscriptionSpecificField from "../helpers/specific_field/subscription.specific_field"
+import PaymentMethodDatasource from "../datasources/payment_method.datasource"
+import PaymentMethodSpecificField from "../helpers/specific_field/payment_method.specific_field"
 
-interface SeederDataSubscription {
+interface SeederDataPaymentMethod {
     title: string
     description: string
     pricing: number
@@ -13,11 +13,11 @@ interface SeederDataSubscription {
 }
 
 const URL_SEEDER_FILE =
-    "src/features/subscription/seeders/data/subscriptions.json"
+    "src/features/subscription/seeders/data/payment_methods.json"
 
-export default class SubscriptionSeeder extends ApiResponse implements ISeeder {
+export default class PaymentMethodSeeder extends ApiResponse implements ISeeder {
     constructor(
-        private datasource = new SubscriptionDatasource(),
+        private datasource = new PaymentMethodDatasource(),
         private urlSeeder = URL_SEEDER_FILE,
         private matricule = new MatriculeGenerate(),
     ) {
@@ -28,9 +28,9 @@ export default class SubscriptionSeeder extends ApiResponse implements ISeeder {
         try {
             const fileContentBuffer = await readFile(this.urlSeeder)
             const fileContentString = fileContentBuffer.toString("utf-8")
-            const parsedData: SeederDataSubscription[] = JSON.parse(
+            const parsedData: SeederDataPaymentMethod[] = JSON.parse(
                 fileContentString,
-                ) as SeederDataSubscription[]
+                ) as SeederDataPaymentMethod[]
             return parsedData
         } catch (error) {
             return null
@@ -39,10 +39,10 @@ export default class SubscriptionSeeder extends ApiResponse implements ISeeder {
 
     async seed(): Promise<object> {
         try {
-            const subscriptions = await this.getFileSeeder()
-            if (subscriptions) {
+            const payment_methods = await this.getFileSeeder()
+            if (payment_methods) {
                 const { success, alreadyCreated, total } =
-                    await this.insertSeederIsNotExist(subscriptions)
+                    await this.insertSeederIsNotExist(payment_methods)
 
                 const response = {
                     size: total,
@@ -53,31 +53,31 @@ export default class SubscriptionSeeder extends ApiResponse implements ISeeder {
                 return {
                     statusCode: 200,
                     success: true,
-                    message: "SEEDERS ABONNEMENT",
+                    message: "SEEDERS METHODE PAIEMENT",
                     data: response,
                 }
             }
             return {
                 statusCode: 500,
                 success: false,
-                message: "FICHIER SEEDERS ABONNEMENT INTROUVABLE",
+                message: "FICHIER SEEDERS METHODE PAIEMENT INTROUVABLE",
             }
         } catch (error) {
             return {
                 statusCode: 500,
                 success: false,
-                message: "ERREURS SEEDERS ABONNEMENT",
+                message: "ERREURS SEEDERS METHODE PAIEMENT",
             }
         }
     }
 
-    async insertSeederIsNotExist(subscriptions: SeederDataSubscription[]) {
-        const seederToInsert = subscriptions.length
+    async insertSeederIsNotExist(payment_methods: SeederDataPaymentMethod[]) {
+        const seederToInsert = payment_methods.length
         let Inserted = 0
         let alreadyCreated = 0
 
-        for (const subscription of subscriptions) {
-            const insertInto = await this.saveData(subscription)
+        for (const payment_method of payment_methods) {
+            const insertInto = await this.saveData(payment_method)
             if (insertInto) {
                 Inserted += 1
             } else {
@@ -92,19 +92,19 @@ export default class SubscriptionSeeder extends ApiResponse implements ISeeder {
         }
     }
 
-    async saveData(subscription: SeederDataSubscription) {
+    async saveData(payment_method: SeederDataPaymentMethod) {
         try {
-            const body = SubscriptionSpecificField.fromSeeder(subscription)
+            const body = PaymentMethodSpecificField.fromSeeder(payment_method)
 
-            let isExisteSubscription
-            if (body.title) {
-                const matchSubscription = {
-                    title: body.title,
+            let isExistePaymentMethod
+            if (body.name_payment) {
+                const matchPaymentMethod = {
+                    name_payment: body.name_payment,
                 }
-                isExisteSubscription = await this.datasource.isExiste(matchSubscription)
+                isExistePaymentMethod = await this.datasource.isExiste(matchPaymentMethod)
             }
             
-            if (!isExisteSubscription) {
+            if (!isExistePaymentMethod) {
                 const code = this.matricule.generate()
 
                 const bodyRequest = {

@@ -4,20 +4,20 @@ import IController from "../../../core/interfaces/interface_controller"
 import ApiResponse from "../../../core/utils/ApiResponse"
 import OptionPagination from "../../../core/utils/option_pagination"
 
-import SubscriptionParamsVerify from "../helpers/params_verify/subscription.params_verify"
-import SubscriptionRepository from "../repositories/subscription.repository"
+import PaymentMethodParamsVerify from "../helpers/params_verify/payment_method.params_verify"
+import PaymentMethodRepository from "../repositories/payment_method.repository"
 
 
-interface ISubscriptionController extends IController {
+interface IPaymentMethodController extends IController {
     indexGuest(req: Request, res: Response): any
     changeStatus(req: Request, res: Response): any
 }
 
-export default class SubscriptionController
+export default class PaymentMethodController
     extends ApiResponse
-    implements ISubscriptionController {
-    private verifyParams = new SubscriptionParamsVerify()
-    constructor(private repository: SubscriptionRepository) {
+    implements IPaymentMethodController {
+    private verifyParams = new PaymentMethodParamsVerify()
+    constructor(private repository: PaymentMethodRepository) {
         super("")
     }
 
@@ -28,7 +28,7 @@ export default class SubscriptionController
                 pagination.page,
                 pagination.limit,
             )
-            return this.success(res, 200, "La liste des abonnements", result)
+            return this.success(res, 200, "La liste des méthodes de paiement", result)
         } catch (error: any) {
             return this.fail(res, error.message)
         }
@@ -37,7 +37,7 @@ export default class SubscriptionController
     async indexGuest(req: Request, res: Response) {
         try {
             const result = await this.repository.getAllByGuest()
-            return this.success(res, 200, "La liste des abonnements | Public", result)
+            return this.success(res, 200, "La liste des méthodes de paiement | Public", result)
         } catch (error: any) {
             return this.fail(res, error.message)
         }
@@ -54,7 +54,7 @@ export default class SubscriptionController
                 return this.created(
                     res,
                     201,
-                    "Un nouveau abonnement a été ajouté",
+                    "Une nouvelle méthode de paiement a été ajoutée",
                     result,
                 )
             }
@@ -71,7 +71,7 @@ export default class SubscriptionController
             const { code } = params
 
             const result = await this.repository.getOneByCode(code)
-            return this.success(res, 200, "Détail d'un abonnement", result)
+            return this.success(res, 200, "Détail d'une méthode de paiement", result)
         } catch (error: any) {
             return this.sendError(error.message, res)
         }
@@ -102,7 +102,7 @@ export default class SubscriptionController
             return this.created(
                 res,
                 200,
-                "Le status abonnement a été mis à jour",
+                "Le status méthode de paiement a été mis à jour",
                 result,
             )
         } catch (error: any) {

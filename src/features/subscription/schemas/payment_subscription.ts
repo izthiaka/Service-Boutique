@@ -2,7 +2,7 @@ import mongoose, { Schema, model } from "mongoose"
 
 import { COLLECTION_SHOP_USER_NAME } from "../../user/schemas/shop_user"
 import { COLLECTION_SUBSCRIPTION_NAME } from "./subscription"
-import { COLLECTION_PAYMENT_METHOD_NAME } from "./payment_methods"
+import { COLLECTION_PAYMENT_METHOD_NAME } from "./payment_method"
 
 export const COLLECTION_PAYMENT_SUBSCRIPTION_NAME = "subscription_payments"
 

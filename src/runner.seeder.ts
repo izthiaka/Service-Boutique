@@ -10,12 +10,12 @@ import ShopOwnershipSeeder from "./features/user/seeders/shop_ownership.seeder"
 const { log } = console
 
 const allSeeders: Array<ISeeder> = [
-    new ShopOwnershipSeeder(),
-    new ShopManagershipSeeder(),
     new RoleSeeder(),
-    new ShopCategorySeeder(),
-    new ShopSeeder(),
-    new SubscriptionSeeder()
+    // new ShopOwnershipSeeder(),
+    // new ShopManagershipSeeder(),
+    // new ShopCategorySeeder(),
+    // new ShopSeeder(),
+    // new SubscriptionSeeder()
 ]
 
 export default function runnerSeeder() {
