@@ -2,19 +2,19 @@ import { readFile } from "fs/promises"
 import ISeeder from "../../../core/interfaces/interface_seeder"
 import ApiResponse from "../../../core/utils/ApiResponse"
 import MatriculeGenerate from "../../../core/utils/matricule_generate"
-import ShopCategoryDatasource from "../datasources/category.datasource"
-import ShopCategorySpecificField from "../helpers/specific_field/category.specific_field"
+import CategoryDatasource from "../datasources/category.datasource"
+import CategorySpecificField from "../helpers/specific_field/category.specific_field"
 
-interface SeederDataShopCategory {
+interface SeederDataCategory {
     name: string
 }
 
 const URL_SEEDER_FILE =
     "src/features/shop/seeders/data/categories.json"
 
-export default class ShopCategorySeeder extends ApiResponse implements ISeeder {
+export default class CategorySeeder extends ApiResponse implements ISeeder {
     constructor(
-        private datasource = new ShopCategoryDatasource(),
+        private datasource = new CategoryDatasource(),
         private urlSeeder = URL_SEEDER_FILE,
         private matricule = new MatriculeGenerate(),
     ) {
@@ -25,9 +25,9 @@ export default class ShopCategorySeeder extends ApiResponse implements ISeeder {
         try {
             const fileContentBuffer = await readFile(this.urlSeeder)
             const fileContentString = fileContentBuffer.toString("utf-8")
-            const parsedData: SeederDataShopCategory[] = JSON.parse(
+            const parsedData: SeederDataCategory[] = JSON.parse(
                 fileContentString,
-                ) as SeederDataShopCategory[]
+                ) as SeederDataCategory[]
             return parsedData
         } catch (error) {
             return null
@@ -68,7 +68,7 @@ export default class ShopCategorySeeder extends ApiResponse implements ISeeder {
         }
     }
 
-    async insertSeederIsNotExist(categories: SeederDataShopCategory[]) {
+    async insertSeederIsNotExist(categories: SeederDataCategory[]) {
         const seederToInsert = categories.length
         let Inserted = 0
         let alreadyCreated = 0
@@ -89,19 +89,19 @@ export default class ShopCategorySeeder extends ApiResponse implements ISeeder {
         }
     }
 
-    async saveData(category: SeederDataShopCategory) {
+    async saveData(category: SeederDataCategory) {
         try {
-            const body = ShopCategorySpecificField.fromSeeder(category)
+            const body = CategorySpecificField.fromSeeder(category)
 
-            let isExisteShopCategory
+            let isExisteCategory
             if (body.name) {
-                const matchShopCategory = {
+                const matchCategory = {
                     name: body.name,
                 }
-                isExisteShopCategory = await this.datasource.isExiste(matchShopCategory)
+                isExisteCategory = await this.datasource.isExiste(matchCategory)
             }
             
-            if (!isExisteShopCategory) {
+            if (!isExisteCategory) {
                 const code = this.matricule.generate()
 
                 const bodyRequest = {

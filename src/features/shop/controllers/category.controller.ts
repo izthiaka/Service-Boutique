@@ -4,25 +4,25 @@ import IController from "../../../core/interfaces/interface_controller"
 import ApiResponse from "../../../core/utils/ApiResponse"
 import OptionPagination from "../../../core/utils/option_pagination"
 
-import ShopCategoryParamsVerify from "../helpers/params_verify/category.params_verify"
-import ShopCategoryRepository from "../repositories/category.repository"
+import CategoryParamsVerify from "../helpers/params_verify/category.params_verify"
+import CategoryRepository from "../repositories/category.repository"
 import UrlFileUtil from "../../../core/utils/url_file"
 import VerifyField from "../../../core/utils/verify_field"
 
 
-interface IShopManagerController extends IController {
+interface ICategoryController extends IController {
     updatePicture(req: Request, res: Response): any
     resetPicture(req: Request, res: Response): any
 }
 
-const staticUrlImage = "images/shops/categories"
+const staticUrlImage = "images/categories"
 
-export default class ShopCategoryController
+export default class CategoryController
     extends ApiResponse
-    implements IShopManagerController {
-    private verifyParams = new ShopCategoryParamsVerify()
+    implements ICategoryController {
+    private verifyParams = new CategoryParamsVerify()
     private verifyField = new VerifyField()
-    constructor(private repository: ShopCategoryRepository) {
+    constructor(private repository: CategoryRepository) {
         super("")
     }
 
@@ -108,7 +108,7 @@ export default class ShopCategoryController
                     const body = { "photo": urlHost }
     
                     const result = await this.repository.updatePictureByCode(req, params.code, body)
-                    return this.success(res, 200, "Mise à jour Photo Profil avec succés", result)
+                    return this.success(res, 200, "Mise à jour Photo Catégorie avec succés", result)
                 }
                 return this.clientError(res, "Pas d'image")
             }
@@ -125,7 +125,7 @@ export default class ShopCategoryController
             const MESSAGE_ERROR = this.verifyParams.code(params)
             if (MESSAGE_ERROR === null) {
                 const result = await this.repository.resetPictureByCode(req, params.code)
-                return this.success(res, 200, "Mise à jour Photo Profil avec succés", result)
+                return this.success(res, 200, "Mise à jour Photo Catégorie avec succés", result)
             }
             return this.clientError(res, MESSAGE_ERROR)
         } catch (error: any) {

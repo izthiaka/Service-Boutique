@@ -3,13 +3,13 @@ import { ShopEntity } from "../schemas/shop"
 import OptionPagination from "../../../core/utils/option_pagination"
 
 import IDatasource from "../../../core/interfaces/interface_datasource"
-import { COLLECTION_SHOP_CATEGORY_NAME } from "../schemas/category"
+import { COLLECTION_CATEGORY_NAME } from "../schemas/category"
 import { COLLECTION_SHOP_USER_NAME } from "../../user/schemas/shop_user"
 import { COLLECTION_ROLE_NAME } from "../../user/schemas/role"
 
 const LookUpCategory = {
     $lookup: {
-        from: COLLECTION_SHOP_CATEGORY_NAME,
+        from: COLLECTION_CATEGORY_NAME,
         localField: "category",
         foreignField: "code",
         as: "category",
@@ -46,11 +46,33 @@ export default class ShopDatasource
             const FACET = OptionPagination.facetForMongoose(page, limit)
             const result = await this.schema.aggregate([
                 LookUpCategory,
-                { $unwind: "$category" },
+                {
+                    $unwind: {
+                        path: "$category",
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
                 LookUpOwner,
                 { $unwind: "$owner" },
                 LookUpRole,
                 { $unwind: "$owner.role" },
+                {
+                    $group: {
+                        _id: '$_id',
+                        code: { $first: '$code' },
+                        name: { $first: '$name' },
+                        phone: { $first: '$phone' },
+                        email: { $first: '$email' },
+                        status: { $first: '$status' },
+                        photo: { $first: '$photo' },
+                        description: { $first: '$description' },
+                        adresse: { $first: '$adresse' },
+                        owner: { $first: '$owner' },
+                        createdAt: { $first: '$createdAt' },
+                        updatedAt: { $first: '$updatedAt' },
+                        categories: { $push: '$category' },
+                    }
+                },
                 {
                     $sort: { name: 1 },
                 },
@@ -65,11 +87,33 @@ export default class ShopDatasource
         try {
             const result = await this.schema.aggregate([
                 LookUpCategory,
-                { $unwind: "$category" },
+                {
+                    $unwind: {
+                        path: "$category",
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
                 LookUpOwner,
                 { $unwind: "$owner" },
                 LookUpRole,
                 { $unwind: "$owner.role" },
+                {
+                    $group: {
+                        _id: '$_id',
+                        code: { $first: '$code' },
+                        name: { $first: '$name' },
+                        phone: { $first: '$phone' },
+                        email: { $first: '$email' },
+                        status: { $first: '$status' },
+                        photo: { $first: '$photo' },
+                        description: { $first: '$description' },
+                        adresse: { $first: '$adresse' },
+                        owner: { $first: '$owner' },
+                        createdAt: { $first: '$createdAt' },
+                        updatedAt: { $first: '$updatedAt' },
+                        categories: { $push: '$category' },
+                    }
+                },
                 { $match: match },
 
             ]).exec()
@@ -84,12 +128,34 @@ export default class ShopDatasource
         try {
             const result = await this.schema
                 .aggregate([
-                LookUpCategory,
-                { $unwind: "$category" },
-                LookUpOwner,
-                { $unwind: "$owner" },
-                LookUpRole,
-                { $unwind: "$owner.role" },
+                    LookUpCategory,
+                    {
+                        $unwind: {
+                            path: "$category",
+                            preserveNullAndEmptyArrays: true
+                        }
+                    },
+                    LookUpOwner,
+                    { $unwind: "$owner" },
+                    LookUpRole,
+                    { $unwind: "$owner.role" },
+                    {
+                        $group: {
+                            _id: '$_id',
+                            code: { $first: '$code' },
+                            name: { $first: '$name' },
+                            phone: { $first: '$phone' },
+                            email: { $first: '$email' },
+                            status: { $first: '$status' },
+                            photo: { $first: '$photo' },
+                            description: { $first: '$description' },
+                            adresse: { $first: '$adresse' },
+                            owner: { $first: '$owner' },
+                            createdAt: { $first: '$createdAt' },
+                            updatedAt: { $first: '$updatedAt' },
+                            categories: { $push: '$category' },
+                        }
+                    },
                     { $match: { name: name } },
                 ])
                 .exec()
@@ -105,11 +171,33 @@ export default class ShopDatasource
             const result = await this.schema
                 .aggregate([
                     LookUpCategory,
-                    { $unwind: "$category" },
+                    {
+                        $unwind: {
+                            path: "$category",
+                            preserveNullAndEmptyArrays: true
+                        }
+                    },
                     LookUpOwner,
                     { $unwind: "$owner" },
                     LookUpRole,
                     { $unwind: "$owner.role" },
+                    {
+                        $group: {
+                            _id: '$_id',
+                            code: { $first: '$code' },
+                            name: { $first: '$name' },
+                            phone: { $first: '$phone' },
+                            email: { $first: '$email' },
+                            status: { $first: '$status' },
+                            photo: { $first: '$photo' },
+                            description: { $first: '$description' },
+                            adresse: { $first: '$adresse' },
+                            owner: { $first: '$owner' },
+                            createdAt: { $first: '$createdAt' },
+                            updatedAt: { $first: '$updatedAt' },
+                            categories: { $push: '$category' },
+                        }
+                    },
                     { $match: { code: code } },
                 ])
                 .exec()
@@ -161,18 +249,40 @@ export default class ShopDatasource
             const FACET = OptionPagination.facetForMongoose(page, limit)
             const result = await this.schema.aggregate([
                 LookUpCategory,
-                { $unwind: "$category" },
+                {
+                    $unwind: {
+                        path: "$category",
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
                 LookUpOwner,
                 { $unwind: "$owner" },
                 LookUpRole,
                 { $unwind: "$owner.role" },
-                {   $match:  {
+                {
+                    $group: {
+                        _id: '$_id',
+                        code: { $first: '$code' },
+                        name: { $first: '$name' },
+                        phone: { $first: '$phone' },
+                        email: { $first: '$email' },
+                        status: { $first: '$status' },
+                        photo: { $first: '$photo' },
+                        description: { $first: '$description' },
+                        adresse: { $first: '$adresse' },
+                        owner: { $first: '$owner' },
+                        createdAt: { $first: '$createdAt' },
+                        updatedAt: { $first: '$updatedAt' },
+                        categories: { $push: '$category' },
+                    }
+                },
+                {
+                    $match: {
                         $or: [
                             { name: searchString },
                             { email: searchString },
                             { phone: searchString },
                             { matricule: searchString },
-                            { "category.name": searchString },
                             { "owner.name": searchString }
                         ]
                     }

@@ -1,16 +1,15 @@
-import { ShopCategoryEntity } from "../schemas/category"
+import { CategoryEntity } from "../schemas/category"
 
 import OptionPagination from "../../../core/utils/option_pagination"
-
 import IDatasource from "../../../core/interfaces/interface_datasource"
 
-export interface IDatasourceShopCategory extends IDatasource {
+export interface IDatasourceCategory extends IDatasource {
     isExiste(match: object): Promise<boolean>
 }
 
-export default class ShopCategoryDatasource
-    implements IDatasourceShopCategory {
-    constructor(private schema = ShopCategoryEntity) { }
+export default class CategoryDatasource
+    implements IDatasourceCategory {
+    constructor(private schema = CategoryEntity) { }
 
     async findAll(page: string, limit: string) {
         try {

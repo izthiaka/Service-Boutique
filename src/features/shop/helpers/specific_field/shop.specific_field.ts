@@ -2,7 +2,7 @@ import ShopOwnerSpecificField from "../../../user/helpers/specific_field/shop_ow
 import ShopCategorySpecificField from "./category.specific_field"
 
 export default class ShopSpecificField {
-    
+
     static fromBody(objet: any) {
         return {
             name: objet.name,
@@ -14,7 +14,7 @@ export default class ShopSpecificField {
             owner: objet.proprio,
         }
     }
-    
+
     static fromSeeder(objet: any) {
         return {
             name: objet.name,
@@ -28,13 +28,16 @@ export default class ShopSpecificField {
     }
 
     static fields(objet: any) {
+        const categories = objet.categories.map((value: object) =>
+            ShopCategorySpecificField.fields(value)
+        )
         return {
             code: objet.code,
             name: objet.name,
             photo: objet.photo,
             email: objet.email,
             phone: objet.phone,
-            category: ShopCategorySpecificField.fields(objet.category),
+            categories: categories,
             adresse: objet.adresse,
             description: objet.description,
             owner: ShopOwnerSpecificField.fields(objet.owner),
@@ -43,13 +46,16 @@ export default class ShopSpecificField {
     }
 
     static fieldsOnly(objet: any) {
+        const categories = objet.categories.map((value: object) =>
+            ShopCategorySpecificField.fields(value)
+        )
         return {
             code: objet.code,
             name: objet.name,
             photo: objet.photo,
             email: objet.email,
             phone: objet.phone,
-            category: ShopCategorySpecificField.fields(objet.category),
+            categories: categories,
             adresse: objet.adresse,
             description: objet.description,
             status: objet.status
@@ -63,13 +69,16 @@ export default class ShopSpecificField {
     }
 
     static fieldsDetail(objet: any) {
+        const categories = objet.categories.map((value: object) =>
+            ShopCategorySpecificField.fields(value)
+        )
         return {
             code: objet.code,
             name: objet.name,
             photo: objet.photo,
             email: objet.email,
             phone: objet.phone,
-            category: ShopCategorySpecificField.fields(objet.category),
+            categories: categories,
             adresse: objet.adresse,
             description: objet.description,
             owner: ShopOwnerSpecificField.fields(objet.owner),

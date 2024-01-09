@@ -4,7 +4,7 @@ import ApiResponse from "../../../core/utils/ApiResponse"
 import MatriculeGenerate from "../../../core/utils/matricule_generate"
 import ShopDatasource from "../datasources/shop.datasource"
 import ShopSpecificField from "../helpers/specific_field/shop.specific_field"
-import ShopCategoryDatasource from "../datasources/category.datasource"
+import CategoryDatasource from "../datasources/category.datasource"
 import ShopOwnerDatasource from "../../user/datasources/shop_ownership.datasource"
 
 interface SeederDataShop {
@@ -13,7 +13,7 @@ interface SeederDataShop {
     phone: string
     category_boutique: string
     adresse: object
-    owner: string
+    proprio: string
     description: string
 }
 
@@ -101,26 +101,42 @@ export default class ShopSeeder extends ApiResponse implements ISeeder {
         try {
             const body = ShopSpecificField.fromSeeder(shop)
 
-            let isExisteShop
-            if (body.name) {
+            let isExisteShopEmail
+            if (body.email) {
                 const matchShop = {
-                    name: body.name,
+                    email: body.email,
                 }
-                isExisteShop = await this.datasource.isExiste(matchShop)
+                isExisteShopEmail = await this.datasource.isExiste(matchShop)
             }
-            const categoryDatasource = new ShopCategoryDatasource()
-            const category = await categoryDatasource.findOneByName(body.category)
+
+            let isExisteShopPhone
+            if (body.phone) {
+                const matchShop = {
+                    phone: body.phone,
+                }
+                isExisteShopPhone = await this.datasource.isExiste(matchShop)
+            }
+
+            let categories: string[] = []
+            await Promise.all(body.category.map(async (category: string) => {
+                const categoryDatasource = new CategoryDatasource()
+                const cat = await categoryDatasource.findOneByName(category)
+                if (cat) {
+                    categories.push(cat.code)
+                }
+            }))
 
             const ownerDatasource = new ShopOwnerDatasource()
             const owner = await ownerDatasource.findOneByName(body.owner)
-
-            if (!isExisteShop && category && owner) {
+            
+            const category = categories.length === body.category.length
+            if (!isExisteShopEmail && !isExisteShopPhone && category && owner) {
                 const code = this.matricule.generate()
 
                 const bodyRequest = {
                     ...body,
                     code,
-                    category: category.code,
+                    category: categories,
                     owner: owner.matricule
                 }
 

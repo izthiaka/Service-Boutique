@@ -1,25 +1,25 @@
 import { Request } from "express"
 
-import IDatasourceShopCategory from "../datasources/category.datasource"
+import IDatasourceCategory from "../datasources/category.datasource"
 import IRepository from "../../../core/interfaces/interface_repository"
 
 import VerifyField from "../../../core/utils/verify_field"
-import ShopCategorySpecificField from "../helpers/specific_field/category.specific_field"
+import CategorySpecificField from "../helpers/specific_field/category.specific_field"
 import MatriculeGenerate from "../../../core/utils/matricule_generate"
 import UrlFileUtil from "../../../core/utils/url_file"
 
 
-interface IShopCategoryRepository extends IRepository {
+interface ICategoryRepository extends IRepository {
     updatePictureByCode(req: Request, matricule: string, body: object): any
     resetPictureByCode(req: Request, matricule: string,): any
 }
 
-export default class ShopCategoryRepository
+export default class CategoryRepository
     extends VerifyField
-    implements IShopCategoryRepository {
+    implements ICategoryRepository {
     private matricule = new MatriculeGenerate()
 
-    constructor(private datasource: IDatasourceShopCategory) {
+    constructor(private datasource: IDatasourceCategory) {
         super()
     }
 
@@ -29,7 +29,7 @@ export default class ShopCategoryRepository
 
             if (result.data.length !== 0) {
                 const list = result.data.map((value: object) =>
-                    ShopCategorySpecificField.fields(value),
+                    CategorySpecificField.fields(value),
                 )
                 return {
                     pagination: {
@@ -48,14 +48,14 @@ export default class ShopCategoryRepository
 
     async save(body: any) {
         try {
-            const data = ShopCategorySpecificField.fromBody(body)
+            const data = CategorySpecificField.fromBody(body)
 
             if (data.name) {
-                const matchShopCategory = {
+                const matchCategory = {
                     name: data.name,
                 }
-                const isExisteShopCategory = await this.datasource.isExiste(matchShopCategory)
-                if (isExisteShopCategory) throw Error(`La Categorie [${data.name}] existe déjà dans la base`)
+                const isExisteCategory = await this.datasource.isExiste(matchCategory)
+                if (isExisteCategory) throw Error(`La Categorie [${data.name}] existe déjà dans la base`)
             }
                 
             const code = this.matricule.generate()
@@ -67,7 +67,7 @@ export default class ShopCategoryRepository
             await this.datasource.store(bodyRequest)
 
             const result = await this.datasource.findOneByCode(code)
-            return ShopCategorySpecificField.fields(result)
+            return CategorySpecificField.fields(result)
         } catch (error: any) {
             throw Error(error)
         }
@@ -77,7 +77,7 @@ export default class ShopCategoryRepository
         try {
             const result = await this.datasource.findOneByCode(code)
             if (this.isValid(result)) {
-                return ShopCategorySpecificField.fieldsDetail(result)
+                return CategorySpecificField.fieldsDetail(result)
             }
             throw Error("Categorie introuvable")
         } catch (error: any) {
@@ -89,22 +89,22 @@ export default class ShopCategoryRepository
         try {
             const result = await this.datasource.findOneByCode(code)
             if (this.isValid(result)) {
-                const data = ShopCategorySpecificField.fromBody(body)
+                const data = CategorySpecificField.fromBody(body)
     
                 if (data.name) {
-                    const matchShopCategory = {
+                    const matchCategory = {
                         name: data.name,
                     }
-                    const isExisteShopCategory = await this.datasource.isExisteAndReturnData(matchShopCategory)
-                    if(isExisteShopCategory){
-                        if (isExisteShopCategory.name !== result.name) throw Error(`La Categorie [${data.name}] existe déjà dans la base`)
+                    const isExisteCategory = await this.datasource.isExisteAndReturnData(matchCategory)
+                    if(isExisteCategory){
+                        if (isExisteCategory.name !== result.name) throw Error(`La Categorie [${data.name}] existe déjà dans la base`)
                     }
                 }
 
                 const collection = await this.datasource.update(code, data)
                 if (this.isValid(collection)) {
                     const data = await this.datasource.findOneByCode(code)
-                    return ShopCategorySpecificField.fields(data)
+                    return CategorySpecificField.fields(data)
                 }
             }
             throw Error("Categorie introuvable")
@@ -138,7 +138,7 @@ export default class ShopCategoryRepository
                         )
                     }
                     const data = await this.datasource.findOneByCode(code)
-                    return ShopCategorySpecificField.fields(data)
+                    return CategorySpecificField.fields(data)
                 }
             }
             throw Error("Catégorie introuvable")
@@ -161,7 +161,7 @@ export default class ShopCategoryRepository
                     )
                 }
                     const data = await this.datasource.findOneByCode(code)
-                    return ShopCategorySpecificField.fields(data)
+                    return CategorySpecificField.fields(data)
                 }
             }
             throw Error("Catégorie introuvable")

@@ -14,16 +14,10 @@ import settingApiKey from "../core/config/api_key"
 
 
 import SHOP_OWNERSHIP_V1_ROUTES from "../features/user/routes/shop_ownership.routeHandle"
-import SHOP_MANAGER_V1_ROUTES from "../features/user/routes/shop_manager.routeHandle"
 import ROLE_V1_ROUTES from "../features/user/routes/role.routeHandle"
 
-import SHOP_CATEGORY_V1_ROUTES from "../features/shop/routes/category.routeHandle"
+import CATEGORY_V1_ROUTES from "../features/shop/routes/category.routeHandle"
 import SHOP_V1_ROUTES from "../features/shop/routes/shop.routeHandle"
-
-import SUBSCRIPTION_V1_ROUTES from "../features/subscription/routes/subscription.routeHandle"
-import PAYMENT_METHOD_V1_ROUTES from "../features/subscription/routes/payment_method.routeHandle"
-import PRODUCT_CATEGORY_V1_ROUTES from "../features/product/routes/category.routeHandle"
-
 
 const app = express()
 
@@ -67,18 +61,10 @@ app.use(settingApiKey)
 
 // USER
 app.use(`${PREFIX_API_V1}/users/shop_ownerships`, SHOP_OWNERSHIP_V1_ROUTES)
-app.use(`${PREFIX_API_V1}/users/shop_managers`, SHOP_MANAGER_V1_ROUTES)
 app.use(`${PREFIX_API_V1}/users/roles`, ROLE_V1_ROUTES)
 
 // BOUTIQUE
-app.use(`${PREFIX_API_V1}/shops/categories`, SHOP_CATEGORY_V1_ROUTES)
+app.use(`${PREFIX_API_V1}/shops/categories`, CATEGORY_V1_ROUTES)
 app.use(`${PREFIX_API_V1}/shops`, SHOP_V1_ROUTES)
-
-// PRODUIT
-app.use(`${PREFIX_API_V1}/products/categories`, PRODUCT_CATEGORY_V1_ROUTES)
-
-// ABONNEMENT
-app.use(`${PREFIX_API_V1}/abonnements`, SUBSCRIPTION_V1_ROUTES)
-app.use(`${PREFIX_API_V1}/payment_methods`, PAYMENT_METHOD_V1_ROUTES)
 
 export default app

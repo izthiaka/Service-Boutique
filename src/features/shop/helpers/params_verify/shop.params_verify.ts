@@ -54,10 +54,10 @@ export default class ShopParamsVerify extends VerifyField {
 
     category(req_body: any) {
         if (this.isValid(req_body.category_boutique)) {
-            if (this.isString(req_body.category_boutique)) {
+            if (this.isValidArray(req_body.category_boutique)) {
                 return null
             }
-            return "L'input [category_boutique] doit être une chaîne"
+            return "L'input [category_boutique] doit être un tableau"
         }
         return "L'input [category_boutique] est requis"
     }

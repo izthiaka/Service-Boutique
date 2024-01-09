@@ -1,21 +1,17 @@
 import ISeeder from "./core/interfaces/interface_seeder"
 
-import ShopCategorySeeder from "./features/shop/seeders/category.seeder"
+import CategorySeeder from "./features/shop/seeders/category.seeder"
 import ShopSeeder from "./features/shop/seeders/shop.seeder"
-import SubscriptionSeeder from "./features/subscription/seeders/subscription.seeder"
 import RoleSeeder from "./features/user/seeders/role.seeder"
-import ShopManagershipSeeder from "./features/user/seeders/shop_manager.seeder"
 import ShopOwnershipSeeder from "./features/user/seeders/shop_ownership.seeder"
 
 const { log } = console
 
 const allSeeders: Array<ISeeder> = [
     new RoleSeeder(),
-    // new ShopOwnershipSeeder(),
-    // new ShopManagershipSeeder(),
-    // new ShopCategorySeeder(),
-    // new ShopSeeder(),
-    // new SubscriptionSeeder()
+    new CategorySeeder(),
+    new ShopOwnershipSeeder(),
+    new ShopSeeder(),
 ]
 
 export default function runnerSeeder() {

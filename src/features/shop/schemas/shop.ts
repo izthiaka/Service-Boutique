@@ -1,5 +1,5 @@
 import mongoose, { Schema, model } from "mongoose"
-import { COLLECTION_SHOP_CATEGORY_NAME } from "./category"
+import { COLLECTION_CATEGORY_NAME } from "./category"
 import ShopStatus from "../../../core/constant/shop_status"
 import { COLLECTION_SHOP_USER_NAME } from "../../user/schemas/shop_user"
 
@@ -12,7 +12,7 @@ export interface IShop {
     email: string
     phone: string
     photo: string
-    category: string
+    category: [string]
     adresse: object
     description: string
     status: string
@@ -47,8 +47,8 @@ const schema: Schema<ShopSchema> = new Schema<ShopSchema>(
             default: null,
         },
         category: {
-            type: String,
-            ref: COLLECTION_SHOP_CATEGORY_NAME,
+            type: [String],
+            ref: COLLECTION_CATEGORY_NAME,
             required: true,
         },
         adresse: {

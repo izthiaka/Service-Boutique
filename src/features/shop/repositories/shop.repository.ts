@@ -1,13 +1,14 @@
+import { Request } from "express"
+
 import IDatasourceShop from "../datasources/shop.datasource"
 import IRepository from "../../../core/interfaces/interface_repository"
 
 import VerifyField from "../../../core/utils/verify_field"
 import ShopSpecificField from "../helpers/specific_field/shop.specific_field"
 import MatriculeGenerate from "../../../core/utils/matricule_generate"
-import ShopCategoryDatasource from "../datasources/category.datasource"
+import CategoryDatasource from "../datasources/category.datasource"
 import ShopOwnerDatasource from "../../user/datasources/shop_ownership.datasource"
 import UrlFileUtil from "../../../core/utils/url_file"
-import { Request } from "express"
 
 interface IShopRepository extends IRepository {
     updateStatus(matricule: string, body: object): any
@@ -52,17 +53,32 @@ export default class ShopRepository
         try {
             const data = ShopSpecificField.fromBody(body)
 
-            if (data.name) {
+            if (data.email) {
                 const matchShop = {
-                    name: data.name,
+                    email: data.email,
                 }
                 const isExisteShop = await this.datasource.isExiste(matchShop)
-                if (isExisteShop) throw Error(`La Boutique [${data.name}] existe déjà dans la base`)
+                if (isExisteShop) throw Error(`L'email de la Boutique [${data.email}] existe déjà dans la base`)
             }
 
-            const categoryDatasource = new ShopCategoryDatasource()
-            const category = await categoryDatasource.findOneByCode(data.category)
-            if (!category) throw Error(`Categorie Boutique [${data.category}] introuvable`)
+            if (data.phone) {
+                const matchShop = {
+                    phone: data.phone,
+                }
+                const isExisteShop = await this.datasource.isExiste(matchShop)
+                if (isExisteShop) throw Error(`Le numéro Téléphone de la Boutique [${data.phone}] existe déjà dans la base`)
+            }
+
+            let categories: string[] = []
+            await Promise.all(data.category.map(async (categorie: string) => {
+                const categoryDatasource = new CategoryDatasource()
+                const cat = await categoryDatasource.findOneByCode(categorie)
+                if (cat) {
+                    categories.push(cat.code)
+                }
+            }))
+
+            if(categories.length !== data.category.length) throw Error(`Catégorie Boutique [${data.category.filter((x: string) => !categories.includes(x))}] introuvable`)
 
             const ownerDatasource = new ShopOwnerDatasource()
             const owner = await ownerDatasource.findOneByCode(data.owner)
@@ -72,7 +88,6 @@ export default class ShopRepository
             const bodyRequest = {
                 ...data,
                 code,
-                category: category.code,
                 owner: owner.matricule
             }
 
@@ -103,23 +118,39 @@ export default class ShopRepository
             if (this.isValid(result)) {
                 const data = ShopSpecificField.fromBody(body)
     
-                if (data.name) {
-                    const matchShop = {
-                        name: data.name,
+                if (data.email) {
+                    const matchShopEmail = {
+                        email: data.email,
                     }
-                    const isExisteShop = await this.datasource.isExisteAndReturnData(matchShop)
+                    const isExisteShop = await this.datasource.isExisteAndReturnData(matchShopEmail)
                     if(isExisteShop){
-                        if (isExisteShop.name !== result.name) throw Error(`La Boutique [${data.name}] existe déjà dans la base`)
+                        if (isExisteShop.email !== result.email) throw Error(`L'email de la Boutique [${data.email}] existe déjà dans la base`)
+                    }
+                }
+    
+                if (data.phone) {
+                    const matchShopPhone = {
+                        phone: data.phone,
+                    }
+                    const isExisteShop = await this.datasource.isExisteAndReturnData(matchShopPhone)
+                    if(isExisteShop){
+                        if (isExisteShop.phone !== result.phone) throw Error(`Le numéro téléphone de la Boutique [${data.phone}] existe déjà dans la base`)
                     }
                 }
 
-                const categoryDatasource = new ShopCategoryDatasource()
-                const category = await categoryDatasource.findOneByCode(data.category)
-                if (!category) throw Error(`Categorie Boutique [${data.category}] introuvable`)
+                let categories: string[] = []
+                await Promise.all(data.category.map(async (categorie: string) => {
+                    const categoryDatasource = new CategoryDatasource()
+                    const cat = await categoryDatasource.findOneByCode(categorie)
+                    if (cat) {
+                        categories.push(cat.code)
+                    }
+                }))
+
+            if(categories.length !== data.category.length) throw Error(`Catégorie Boutique [${data.category.filter((x: string) => !categories.includes(x))}] introuvable`)
 
                 const bodyRequest = {
                     ...data,
-                    category: category.code,
                 }
                 const collection = await this.datasource.update(code, bodyRequest)
                 if (this.isValid(collection)) {

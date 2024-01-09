@@ -1,17 +1,17 @@
 import mongoose, { Schema, model } from "mongoose"
 
-export const COLLECTION_SHOP_CATEGORY_NAME = "shop_categories"
+export const COLLECTION_CATEGORY_NAME = "shop_categories"
 
-export interface IShopCategory {
+export interface ICategory {
     _id: mongoose.Types.ObjectId
     code: string
     name: string
     photo: string
 }
 
-export type ShopCategorySchema = object & IShopCategory & Document
+export type CategorySchema = object & ICategory & Document
 
-const schema: Schema<ShopCategorySchema> = new Schema<ShopCategorySchema>(
+const schema: Schema<CategorySchema> = new Schema<CategorySchema>(
     {
         code: {
           type: String,
@@ -31,4 +31,4 @@ const schema: Schema<ShopCategorySchema> = new Schema<ShopCategorySchema>(
     { timestamps: true },
 )
 
-export const ShopCategoryEntity = model(COLLECTION_SHOP_CATEGORY_NAME, schema)
+export const CategoryEntity = model(COLLECTION_CATEGORY_NAME, schema)

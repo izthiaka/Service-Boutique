@@ -1,15 +1,15 @@
 import { Router, Request, Response } from "express"
 
-import ShopCategoryController from "../controllers/category.controller"
-import ShopCategoryDatasource from "../datasources/category.datasource"
-import ShopCategoryRepository from "../repositories/category.repository"
+import CategoryController from "../controllers/category.controller"
+import CategoryDatasource from "../datasources/category.datasource"
+import CategoryRepository from "../repositories/category.repository"
 
 const router = Router()
-const datasource = new ShopCategoryDatasource()
-const repository = new ShopCategoryRepository(datasource)
-const controller = new ShopCategoryController(repository)
+const datasource = new CategoryDatasource()
+const repository = new CategoryRepository(datasource)
+const controller = new CategoryController(repository)
 
-import MulterPictureShopCategory from "../helpers/multer/shop_category.multer"
+import MulterPictureCategory from "../helpers/multer/category.multer"
 
 router.get("", (req: Request, res: Response) => {
     return controller.index(req, res)
@@ -27,7 +27,7 @@ router.put("/:code/update", (req: Request, res: Response) => {
     return controller.update(req, res)
 })
 
-router.put("/:code/picture", MulterPictureShopCategory, (req: Request, res: Response) => {
+router.put("/:code/picture", MulterPictureCategory, (req: Request, res: Response) => {
     return controller.updatePicture(req, res)
 })
 
@@ -35,5 +35,5 @@ router.get("/:code/reset_picture", (req: Request, res: Response) => {
     return controller.resetPicture(req, res)
 })
 
-const SHOP_CATEGORY_V1_ROUTES = router
-export default SHOP_CATEGORY_V1_ROUTES
+const CATEGORY_V1_ROUTES = router
+export default CATEGORY_V1_ROUTES

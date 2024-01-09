@@ -4,6 +4,7 @@ export const MIME_TYPES: any = {
   "image/jpg": "jpg",
   "image/jpeg": "jpeg",
   "image/png": "png",
+  "image/svg+xml": "svg",
 }
 
 export const multerArray = (fileName = "files") =>
